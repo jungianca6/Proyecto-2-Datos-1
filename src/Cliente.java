@@ -4,12 +4,12 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 
-class VentanaCliente extends JFrame{
+class VentanaCliente extends JFrame implements Runnable{
     private JPanel panelCliente;
     private JLabel Cliente;
     private JTextField operacion;
     private JTextArea resultado;
-    private JButton solución;
+    private JButton solucion;
 
     /**
      * constructor de la ventana
@@ -24,6 +24,8 @@ class VentanaCliente extends JFrame{
         /**
          * construimos el hilo para que siempre escuche
          */
+        Thread mihilo = new Thread(this);
+        mihilo.start();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
@@ -70,10 +72,28 @@ class VentanaCliente extends JFrame{
     }
 
     private void colocarBoton() {
-        solución = new JButton("Solución");
-        solución.setBounds(140, 370, 100, 30);
-        panelCliente.add(solución);
-        solución.setEnabled(true);
+        solucion = new JButton("Solución");
+        solucion.setBounds(140, 370, 100, 30);
+        panelCliente.add(solucion);
+        solucion.setEnabled(true);
+    }
+
+    @Override
+    public void run() {
+        int port;
+        port = 9091;
+        for (int i = port; i<9100;i++){
+            try {
+                ServerSocket servidorcliente = new ServerSocket(i);
+                Socket cliente;
+
+                while(true){
+                    cliente = servidorcliente.accept();
+                }
+            } catch (IOException e) {
+                //throw new RuntimeException(e);
+            }
+        }
     }
 }
 

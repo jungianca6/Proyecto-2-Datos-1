@@ -4,7 +4,7 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 
-class VentanaServer extends JFrame{
+class VentanaServer extends JFrame implements Runnable{
     private JPanel panelServidor;
     private JLabel Servidor;
 
@@ -21,6 +21,8 @@ class VentanaServer extends JFrame{
         /**
          * construimos el hilo para que siempre escuche
          */
+        Thread mihilo = new Thread(this);
+        mihilo.start();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
@@ -44,6 +46,24 @@ class VentanaServer extends JFrame{
         Servidor.setBackground(Color.BLACK);
         Servidor.setFont(new Font("times new roman", Font.PLAIN,20));
         Servidor.setOpaque(true);
+    }
+
+    @Override
+    public void run() {
+        try {
+            ServerSocket servidor = new ServerSocket(9090);
+
+            while(true) {
+                /**
+                 *Permite que acepte las conexiones del exterior
+                 */
+                Socket misocket = servidor.accept();
+                /**cierra el flujo de datos*/
+                misocket.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
