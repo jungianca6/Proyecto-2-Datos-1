@@ -4,15 +4,15 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 
-class VentanaServer extends JFrame{
+class VentanaCliente extends JFrame{
 
     /**
      * constructor de la ventana
      */
 
-    public VentanaServer() {
+    public VentanaCliente() {
         this.setBounds(500, 200, 300, 300);
-        setTitle("Servidor");
+        setTitle("Cliente");
 
         /**
          * construimos el hilo para que siempre escuche
@@ -22,11 +22,9 @@ class VentanaServer extends JFrame{
     }
 }
 
-public class Servidor {
+public class Cliente {
     public static void main(String[] args) {
-        System.out.println("hola");
-
-        VentanaServer servidor = new VentanaServer();
-        servidor.setVisible(true);
+        VentanaCliente cliente = new VentanaCliente();
+        cliente.setVisible(true);
     }
 }
