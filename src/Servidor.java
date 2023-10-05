@@ -5,6 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 
 class VentanaServer extends JFrame{
+    private JPanel panelServidor;
+    private JLabel Servidor;
 
     /**
      * constructor de la ventana
@@ -14,11 +16,34 @@ class VentanaServer extends JFrame{
         this.setBounds(500, 200, 300, 300);
         setTitle("Servidor");
 
+        componentesServer();
+
         /**
          * construimos el hilo para que siempre escuche
          */
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    private void componentesServer(){
+        panelServidor();
+        etiquetaServer();
+    }
+
+    private void panelServidor(){
+        panelServidor = new JPanel();
+        panelServidor.setLayout(null);
+        this.getContentPane().add(panelServidor);
+    }
+
+    private void etiquetaServer(){
+        Servidor = new JLabel("Servidor",SwingConstants.CENTER);
+        panelServidor.add(Servidor);
+        Servidor.setBounds(50,15,100,25);
+        Servidor.setForeground(Color.WHITE);
+        Servidor.setBackground(Color.BLACK);
+        Servidor.setFont(new Font("times new roman", Font.PLAIN,20));
+        Servidor.setOpaque(true);
     }
 }
 
