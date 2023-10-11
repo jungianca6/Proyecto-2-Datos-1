@@ -67,11 +67,44 @@ class VentanaServer extends JFrame implements Runnable{
     }
 }
 
+class Node {
+    protected Object data;
+    protected Node left;
+    protected Node right;
+
+    public Node(Object data) {
+        this.data = data;
+        left = right = null;
+    }
+}
+class TraversalTree {
+    Node raiz;
+    public TraversalTree(){
+        raiz = null;
+    }
+    public void InOrder(Node node){
+        if (node != null){
+            InOrder(node.left);
+            System.out.print(node.data + " ");
+            InOrder(node.right);
+        }
+    }
+}
+
+
 public class Servidor {
     public static void main(String[] args) {
         System.out.println("hola");
 
         VentanaServer servidor = new VentanaServer();
         servidor.setVisible(true);
+
+        TraversalTree arbol = new TraversalTree();
+        arbol.raiz = new Node("+");
+        arbol.raiz.left = new Node("*");
+        arbol.raiz.right = new Node(7);
+        arbol.raiz.left.left = new Node (6);
+        arbol.raiz.left.right = new Node (5);
+        arbol.InOrder(arbol.raiz);
     }
 }
