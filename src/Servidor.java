@@ -176,7 +176,7 @@ class ArbolBinarioExp{
         return cadena;
     }
 
-    public String toString(int a){
+    public String toString(){
         String cadena = "";
         cadena = inOrden(raiz,cadena);
         return cadena;
