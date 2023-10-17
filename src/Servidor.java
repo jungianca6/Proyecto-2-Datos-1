@@ -268,8 +268,18 @@ class ArbolBinarioExp{
         for (int i=0; i<cadena.length();i++){
             caracterEvaluado = cadena.charAt(i);
             token = new NodeArbol(caracterEvaluado);
-            if (!esOperador(caracterEvaluado)){
-                pilaExpresiones.insertar(token);
+            if (Character.isDigit(caracterEvaluado)){
+                StringBuilder numero = new StringBuilder();
+                while (i<cadena.length() && Character.isDigit(cadena.charAt(i))){
+                    numero.append(cadena.charAt(i));
+                    i++;
+                }
+                i--;
+                NodeArbol numeroNodo = new NodeArbol(numero);
+                pilaExpresiones.insertar(numeroNodo);
+            }
+            else if (!esOperador(caracterEvaluado)){
+
             }else{ /**es un operador*/
                 switch(caracterEvaluado){
                     case '(':
