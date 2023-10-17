@@ -261,6 +261,7 @@ class ArbolBinarioExp{
         NodeArbol op1;
         NodeArbol op2;
         NodeArbol op;
+        NodeArbol numeros;
 
         pilaOperadores = new PilaArbolExp();
         pilaExpresiones = new PilaArbolExp();
