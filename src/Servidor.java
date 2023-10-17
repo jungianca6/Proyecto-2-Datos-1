@@ -1,3 +1,5 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.*;
 import java.io.*;
 import javax.swing.*;
@@ -7,13 +9,16 @@ import java.util.*;
 class VentanaServer extends JFrame implements Runnable{
     private JPanel panelServidor;
     private JLabel Servidor;
+    private JButton solucionS;
+    private JTextField operacion;
+    private JTextField resultado;
 
     /**
      * constructor de la ventana
      */
 
     public VentanaServer() {
-        this.setBounds(500, 200, 300, 300);
+        this.setBounds(500, 200, 450, 450);
         setTitle("Servidor");
 
         componentesServer();
@@ -30,6 +35,8 @@ class VentanaServer extends JFrame implements Runnable{
     private void componentesServer(){
         panelServidor();
         etiquetaServer();
+        colocarCajadeTexto();
+        colocarBoton();
     }
 
     private void panelServidor(){
@@ -46,6 +53,33 @@ class VentanaServer extends JFrame implements Runnable{
         Servidor.setBackground(Color.BLACK);
         Servidor.setFont(new Font("times new roman", Font.PLAIN,20));
         Servidor.setOpaque(true);
+    }
+
+    private void colocarCajadeTexto(){
+        operacion = new JTextField();
+        operacion.setBounds(60,325,250,20);
+        panelServidor.add(operacion);
+
+        resultado = new JTextField();
+        resultado.setBounds(60,205,250,20);
+        panelServidor.add(resultado);
+    }
+
+    private void colocarBoton() {
+        solucionS = new JButton("Solución");
+        solucionS.setBounds(140, 370, 100, 30);
+        panelServidor.add(solucionS);
+        solucionS.setEnabled(true);
+
+        ActionListener calcular = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cadena = operacion.getText();
+                ArbolBinarioExp ABE = new ArbolBinarioExp(cadena);
+                resultado.setText(""+ABE.evaluaExpresion());
+            }
+        };
+        solucionS.addActionListener(calcular);
     }
 
     @Override
