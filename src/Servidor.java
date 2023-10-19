@@ -228,6 +228,10 @@ class ArbolBinarioExp{
                 break;
             case '+':
             case '-':
+            case '&':
+            case '|':
+            case '~':
+            case '#':
                 p=10;
                 break;
             default:
@@ -246,6 +250,10 @@ class ArbolBinarioExp{
             case '/':
             case '+':
             case '-':
+            case '&':
+            case '|':
+            case '~':
+            case '#':
                 resultado = true;
                 break;
             default:
