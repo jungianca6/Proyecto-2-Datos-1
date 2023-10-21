@@ -111,19 +111,6 @@ class NodeArbol {
         left = right = null;
     }
 }
-class TraversalTree {
-    NodeArbol raiz;
-    public TraversalTree(){
-        raiz = null;
-    }
-    public void InOrder(NodeArbol node){
-        if (node != null){
-            InOrder(node.left);
-            System.out.print(node.data + " ");
-            InOrder(node.right);
-        }
-    }
-}
 
 class NodePila{
     protected NodeArbol data;
@@ -245,15 +232,15 @@ class ArbolBinarioExp{
         switch(c){
             case '(':
             case ')':
-            case '^':
+            case '^': //potencia
             case '*':
             case '/':
             case '+':
             case '-':
-            case '&':
-            case '|':
-            case '~':
-            case '#':
+            case '&': //operador logico AND
+            case '|': //operador logico OR
+            case '~': //operador logico NOT
+            case '?': //operador logico XOR
                 resultado = true;
                 break;
             default:
@@ -365,9 +352,34 @@ class ArbolBinarioExp{
                 case '-':
                     acum = acum + evalua(subarbol.left) - evalua(subarbol.right);
                     break;
+
             }
         }
         return acum;
+    }
+
+    private boolean evalualogico(NodeArbol subarbol){
+        boolean logico= false;
+        if (!esOperador(subarbol.data.toString().charAt(0))){
+            return Boolean.parseBoolean(subarbol.data.toString());
+        }else{
+            switch(subarbol.data.toString().charAt(0)){
+                case '&':
+                    logico = evalualogico(subarbol.left) && evalualogico(subarbol.right);
+                    break;
+                case '|':
+                    logico = evalualogico(subarbol.left) || evalualogico(subarbol.right);
+                    break;
+                case '~':
+                    logico = !evalualogico(subarbol.left);
+                    break;
+                case '?':
+                    logico = evalualogico(subarbol.left) ^ evalualogico(subarbol.right);
+                    break;
+
+            }
+        }
+        return logico;
     }
 }
 
@@ -379,12 +391,5 @@ public class Servidor {
         VentanaServer servidor = new VentanaServer();
         servidor.setVisible(true);
 
-        TraversalTree arbol = new TraversalTree();
-        arbol.raiz = new NodeArbol("+");
-        arbol.raiz.left = new NodeArbol("*");
-        arbol.raiz.right = new NodeArbol(7);
-        arbol.raiz.left.left = new NodeArbol (6);
-        arbol.raiz.left.right = new NodeArbol (5);
-        arbol.InOrder(arbol.raiz);
     }
 }
