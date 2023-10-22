@@ -9,16 +9,13 @@ import java.util.*;
 class VentanaServer extends JFrame implements Runnable{
     private JPanel panelServidor;
     private JLabel Servidor;
-    private JButton solucionS;
-    private JTextField operacion;
-    private JTextField resultado;
 
     /**
      * constructor de la ventana
      */
 
     public VentanaServer() {
-        this.setBounds(500, 200, 450, 450);
+        this.setBounds(500, 200, 300, 300);
         setTitle("Servidor");
 
         componentesServer();
@@ -35,8 +32,6 @@ class VentanaServer extends JFrame implements Runnable{
     private void componentesServer(){
         panelServidor();
         etiquetaServer();
-        colocarCajadeTexto();
-        colocarBoton();
     }
 
     private void panelServidor(){
@@ -54,48 +49,44 @@ class VentanaServer extends JFrame implements Runnable{
         Servidor.setFont(new Font("times new roman", Font.PLAIN,20));
         Servidor.setOpaque(true);
     }
-
-    private void colocarCajadeTexto(){
-        operacion = new JTextField();
-        operacion.setBounds(60,325,250,20);
-        panelServidor.add(operacion);
-
-        resultado = new JTextField();
-        resultado.setBounds(60,205,250,20);
-        panelServidor.add(resultado);
-    }
-
-    private void colocarBoton() {
-        solucionS = new JButton("Solución");
-        solucionS.setBounds(140, 370, 100, 30);
-        panelServidor.add(solucionS);
-        solucionS.setEnabled(true);
-
-        ActionListener calcular = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String cadena = operacion.getText();
-                ArbolBinarioExp ABE = new ArbolBinarioExp(cadena);
-                resultado.setText(""+ABE.evaluaExpresion());
-            }
-        };
-        solucionS.addActionListener(calcular);
-    }
-
     @Override
     public void run() {
         try {
             ServerSocket servidor = new ServerSocket(9090);
+            String cadena;
+            double solucionEnviar;
+            paqueteDatos operacionRecibida;
 
             while(true) {
                 /**
                  *Permite que acepte las conexiones del exterior
                  */
                 Socket misocket = servidor.accept();
+
+                ObjectInputStream operacionEntrante = new ObjectInputStream(misocket.getInputStream());
+                operacionRecibida = (paqueteDatos) operacionEntrante.readObject();
+
+                cadena = operacionRecibida.getCadena();
+                ArbolBinarioExp ABE = new ArbolBinarioExp(cadena);
+                solucionEnviar = ABE.evaluaExpresion();
+                operacionRecibida.setCadena(" "+ solucionEnviar);
+
+                int port;
+                port = 9091;
+                for (int i =port; i<9100;i++){
+                    try {
+                        Socket enviaDestinatario = new Socket("localhost",i);
+
+                        ObjectOutputStream reenvioSolucion = new ObjectOutputStream(enviaDestinatario.getOutputStream());
+                        reenvioSolucion.writeObject(operacionRecibida);
+
+                    }
+                    catch (IOException e) {}
+                }
                 /**cierra el flujo de datos*/
                 misocket.close();
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -208,6 +199,9 @@ class ArbolBinarioExp{
         switch (c){
             case '^':
                 p=30;
+                break;
+            case '%':
+                p=25;
                 break;
             case '*':
             case '/':
@@ -352,7 +346,9 @@ class ArbolBinarioExp{
                 case '-':
                     acum = acum + evalua(subarbol.left) - evalua(subarbol.right);
                     break;
-
+                case '%':
+                    acum= acum + (evalua(subarbol.left) * evalua(subarbol.right))/ 100;
+                    break;
             }
         }
         return acum;

@@ -1,3 +1,5 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -7,8 +9,7 @@ import java.awt.*;
 class VentanaCliente extends JFrame implements Runnable{
     private JPanel panelCliente;
     private JLabel Cliente;
-    private JTextField operacion;
-    private JTextArea resultado;
+    private JTextField operacion,resultado;
     private JButton solucion;
 
     /**
@@ -34,10 +35,10 @@ class VentanaCliente extends JFrame implements Runnable{
         panelCliente();
         etiquetaCliente();
         colocarCajadeTexto();
-        colocarAreaText();
         colocarBoton();
         /*colocarCajadeTexto();
         colocarBoton();
+        colocarAreaText();
         colocarAreaText();
         */
     }
@@ -62,20 +63,48 @@ class VentanaCliente extends JFrame implements Runnable{
         operacion = new JTextField();
         operacion.setBounds(60,325,250,20);
         panelCliente.add(operacion);
+
+        resultado = new JTextField();
+        resultado.setBounds(60,205,250,20);
+        panelCliente.add(resultado);
     }
 
-    private void colocarAreaText(){
+    /*private void colocarAreaText(){
         resultado = new JTextArea();
         resultado.setBounds(0,100,450,200);
         panelCliente.add(resultado);
         resultado.setEditable(true);
     }
+     */
 
     private void colocarBoton() {
         solucion = new JButton("Solución");
         solucion.setBounds(140, 370, 100, 30);
         panelCliente.add(solucion);
         solucion.setEnabled(true);
+
+        ActionListener enviaOperacion = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    /**
+                     * creacion del socket
+                     */
+                    Socket misocket = new Socket("localhost",9090);
+
+                    paqueteDatos operaciones = new paqueteDatos();
+                    operaciones.setCadena(operacion.getText());
+
+                    ObjectOutputStream salidaOperacion = new ObjectOutputStream(misocket.getOutputStream());
+                    salidaOperacion.writeObject(operaciones);
+
+                    misocket.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        };
+        solucion.addActionListener(enviaOperacion);
     }
 
     @Override
@@ -86,14 +115,29 @@ class VentanaCliente extends JFrame implements Runnable{
             try {
                 ServerSocket servidorcliente = new ServerSocket(i);
                 Socket cliente;
+                paqueteDatos packRecibido;
 
                 while(true){
                     cliente = servidorcliente.accept();
+                    ObjectInputStream solucionRecibida = new ObjectInputStream(cliente.getInputStream());
+                    packRecibido = (paqueteDatos) solucionRecibida.readObject();
+                    resultado.setText(packRecibido.getCadena());
                 }
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 //throw new RuntimeException(e);
             }
         }
+    }
+}
+
+class paqueteDatos implements Serializable{
+    private String cadena;
+    public String getCadena() {
+        return cadena;
+    }
+
+    public void setCadena(String cadena) {
+        this.cadena = cadena;
     }
 }
 
