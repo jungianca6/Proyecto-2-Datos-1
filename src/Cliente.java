@@ -7,6 +7,13 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.Tesseract;
+import java.io.File;
+
+
+
+
 class VentanaCliente extends JFrame implements Runnable{
     private JPanel panelCliente;
     private JLabel Cliente;

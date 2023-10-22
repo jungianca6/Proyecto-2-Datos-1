@@ -5,6 +5,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.Tesseract;
+import java.io.File;
+
 class VentanaServer extends JFrame implements Runnable{
     private JPanel panelServidor;
     private JLabel Servidor;
