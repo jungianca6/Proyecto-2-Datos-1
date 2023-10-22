@@ -1,3 +1,4 @@
+import org.opencv.core.Core;
 import java.net.*;
 import java.io.*;
 import javax.swing.*;
@@ -380,10 +381,9 @@ class ArbolBinarioExp{
 
 public class Servidor {
     public static void main(String[] args) {
-        System.out.println("hola");
-
         VentanaServer servidor = new VentanaServer();
         servidor.setVisible(true);
 
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 }

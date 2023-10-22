@@ -1,3 +1,4 @@
+import org.opencv.core.Core;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.*;
@@ -36,11 +37,6 @@ class VentanaCliente extends JFrame implements Runnable{
         etiquetaCliente();
         colocarCajadeTexto();
         colocarBoton();
-        /*colocarCajadeTexto();
-        colocarBoton();
-        colocarAreaText();
-        colocarAreaText();
-        */
     }
 
     private void panelCliente(){
@@ -68,14 +64,6 @@ class VentanaCliente extends JFrame implements Runnable{
         resultado.setBounds(60,205,250,20);
         panelCliente.add(resultado);
     }
-
-    /*private void colocarAreaText(){
-        resultado = new JTextArea();
-        resultado.setBounds(0,100,450,200);
-        panelCliente.add(resultado);
-        resultado.setEditable(true);
-    }
-     */
 
     private void colocarBoton() {
         solucion = new JButton("Solución");
@@ -145,5 +133,7 @@ public class Cliente {
     public static void main(String[] args) {
         VentanaCliente cliente = new VentanaCliente();
         cliente.setVisible(true);
+
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 }
