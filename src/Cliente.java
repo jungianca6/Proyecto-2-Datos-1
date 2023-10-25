@@ -12,13 +12,11 @@ import net.sourceforge.tess4j.Tesseract;
 import java.io.File;
 
 
-
-
 class VentanaCliente extends JFrame implements Runnable{
     private JPanel panelCliente;
     private JLabel Cliente;
-    private JTextField operacion,resultado;
-    private JButton solucion;
+    private JTextField operacionA,resultadoA,operacionL,resultadoL;
+    private JButton solucionA,solucionL;
 
     /**
      * constructor de la ventana
@@ -63,22 +61,36 @@ class VentanaCliente extends JFrame implements Runnable{
     }
 
     private void colocarCajadeTexto(){
-        operacion = new JTextField();
-        operacion.setBounds(60,325,250,20);
-        panelCliente.add(operacion);
+        operacionA = new JTextField();
+        operacionA.setBounds(60,325,150,20);
+        panelCliente.add(operacionA);
 
-        resultado = new JTextField();
-        resultado.setBounds(60,205,250,20);
-        panelCliente.add(resultado);
+        resultadoA = new JTextField();
+        resultadoA.setBounds(60,285,150,20);
+        panelCliente.add(resultadoA);
+
+        operacionL = new JTextField();
+        operacionL.setBounds(250,325,150,20);
+        panelCliente.add(operacionL);
+
+        resultadoL = new JTextField();
+        resultadoL.setBounds(250,285,150,20);
+        panelCliente.add(resultadoL);
     }
 
     private void colocarBoton() {
-        solucion = new JButton("Solución");
-        solucion.setBounds(140, 370, 100, 30);
-        panelCliente.add(solucion);
-        solucion.setEnabled(true);
+        solucionA = new JButton("Solución");
+        solucionA.setBounds(90, 370, 100, 30);
+        panelCliente.add(solucionA);
+        solucionA.setEnabled(true);
 
-        ActionListener enviaOperacion = new ActionListener() {
+        solucionL = new JButton("Solución");
+        solucionL.setBounds(290, 370, 100, 30);
+        panelCliente.add(solucionL);
+        solucionL.setEnabled(true);
+
+
+        ActionListener enviaOperacionA = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -88,7 +100,7 @@ class VentanaCliente extends JFrame implements Runnable{
                     Socket misocket = new Socket("localhost",9090);
 
                     paqueteDatos operaciones = new paqueteDatos();
-                    operaciones.setCadena(operacion.getText());
+                    operaciones.setAritmetica(operacionA.getText());
 
                     ObjectOutputStream salidaOperacion = new ObjectOutputStream(misocket.getOutputStream());
                     salidaOperacion.writeObject(operaciones);
@@ -99,7 +111,8 @@ class VentanaCliente extends JFrame implements Runnable{
                 }
             }
         };
-        solucion.addActionListener(enviaOperacion);
+        solucionA.addActionListener(enviaOperacionA);
+
     }
 
     @Override
@@ -115,8 +128,9 @@ class VentanaCliente extends JFrame implements Runnable{
                 while(true){
                     cliente = servidorcliente.accept();
                     ObjectInputStream solucionRecibida = new ObjectInputStream(cliente.getInputStream());
-                    packRecibido = (paqueteDatos) solucionRecibida.readObject();
-                    resultado.setText(packRecibido.getCadena());
+
+                    packRecibido = (paqueteDatos) solucionRecibida.readObject();;
+                    resultadoA.setText(packRecibido.getAritmetica());
                 }
             } catch (IOException | ClassNotFoundException e) {
                 //throw new RuntimeException(e);
@@ -126,13 +140,26 @@ class VentanaCliente extends JFrame implements Runnable{
 }
 
 class paqueteDatos implements Serializable{
-    private String cadena;
-    public String getCadena() {
-        return cadena;
+    private String aritmetica;
+
+    public String getAritmetica() {
+        return aritmetica;
     }
 
-    public void setCadena(String cadena) {
-        this.cadena = cadena;
+    public void setAritmetica(String aritmetica) {
+        this.aritmetica = aritmetica;
+    }
+}
+
+class paqueteLogica implements Serializable{
+    private String logica;
+
+    public String getLogica() {
+        return logica;
+    }
+
+    public void setLogica(String logica) {
+        this.logica = logica;
     }
 }
 

@@ -56,9 +56,12 @@ class VentanaServer extends JFrame implements Runnable{
     public void run() {
         try {
             ServerSocket servidor = new ServerSocket(9090);
-            String cadena;
+            String aritmetica;
+            String logica;
             double solucionEnviar;
+            boolean logicaEnviar;
             paqueteDatos operacionRecibida;
+            paqueteLogica logicaRecibida;
 
             while(true) {
                 /**
@@ -67,12 +70,14 @@ class VentanaServer extends JFrame implements Runnable{
                 Socket misocket = servidor.accept();
 
                 ObjectInputStream operacionEntrante = new ObjectInputStream(misocket.getInputStream());
+
                 operacionRecibida = (paqueteDatos) operacionEntrante.readObject();
 
-                cadena = operacionRecibida.getCadena();
-                ArbolBinarioExp ABE = new ArbolBinarioExp(cadena);
-                solucionEnviar = ABE.evaluaExpresion();
-                operacionRecibida.setCadena(" "+ solucionEnviar);
+                aritmetica = operacionRecibida.getAritmetica();
+                ArbolBinarioExp ABE = new ArbolBinarioExp(aritmetica);
+                solucionEnviar = ABE.evaluaAritmetica();
+                operacionRecibida.setAritmetica(" "+ solucionEnviar);
+
 
                 int port;
                 port = 9091;
@@ -82,6 +87,7 @@ class VentanaServer extends JFrame implements Runnable{
 
                         ObjectOutputStream reenvioSolucion = new ObjectOutputStream(enviaDestinatario.getOutputStream());
                         reenvioSolucion.writeObject(operacionRecibida);
+
 
                     }
                     catch (IOException e) {}
@@ -215,7 +221,7 @@ class ArbolBinarioExp{
             case '&':
             case '|':
             case '~':
-            case '#':
+            case '?':
                 p=10;
                 break;
             default:
@@ -238,6 +244,7 @@ class ArbolBinarioExp{
             case '|': //operador logico OR
             case '~': //operador logico NOT
             case '?': //operador logico XOR
+            case '%':
                 resultado = true;
                 break;
             default:
@@ -269,6 +276,15 @@ class ArbolBinarioExp{
                 i--;
                 NodeArbol numeroNodo = new NodeArbol(numero);
                 pilaExpresiones.insertar(numeroNodo);
+            }else if (Character.isLetter(caracterEvaluado)){
+                StringBuilder logico = new StringBuilder();
+                while (i<cadena.length() && Character.isLetter(cadena.charAt(i))){
+                    logico.append(cadena.charAt(i));
+                    i++;
+                }
+                i--;
+                NodeArbol logicoNodo = new NodeArbol(logico);
+                pilaExpresiones.insertar(logicoNodo);
             }
             else if (!esOperador(caracterEvaluado)){
 
@@ -324,8 +340,12 @@ class ArbolBinarioExp{
         return op;
     }
 
-    public double evaluaExpresion(){
+    public double evaluaAritmetica(){
         return evalua(raiz);
+    }
+
+    public boolean evaluaLogico(){
+        return evalualogico(raiz);
     }
 
     private double evalua(NodeArbol subarbol){
@@ -370,7 +390,7 @@ class ArbolBinarioExp{
                     logico = evalualogico(subarbol.left) || evalualogico(subarbol.right);
                     break;
                 case '~':
-                    logico = !evalualogico(subarbol.left);
+                    logico = !evalualogico(subarbol.right);
                     break;
                 case '?':
                     logico = evalualogico(subarbol.left) ^ evalualogico(subarbol.right);
