@@ -87,8 +87,6 @@ class VentanaServer extends JFrame implements Runnable{
 
                         ObjectOutputStream reenvioSolucion = new ObjectOutputStream(enviaDestinatario.getOutputStream());
                         reenvioSolucion.writeObject(operacionRecibida);
-
-
                     }
                     catch (IOException e) {}
                 }
