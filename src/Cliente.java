@@ -118,7 +118,7 @@ class VentanaCliente extends JFrame implements Runnable{
                     ObjectInputStream solucionRecibida = new ObjectInputStream(cliente.getInputStream());
 
                     packRecibido = (paqueteDatos) solucionRecibida.readObject();;
-                    resultadoA.setText(packRecibido.getOperacion());
+                    resultadoA.setText(packRecibido.getResultado());
                 }
             } catch (IOException | ClassNotFoundException e) {
                 //throw new RuntimeException(e);
@@ -128,7 +128,15 @@ class VentanaCliente extends JFrame implements Runnable{
 }
 
 class paqueteDatos implements Serializable{
-    private String operacion;
+    private String operacion,resultado;
+
+    public String getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
+    }
 
     public String getOperacion() {
         return operacion;

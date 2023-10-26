@@ -1,3 +1,4 @@
+import com.opencsv.CSVWriter;
 import org.opencv.core.Core;
 import java.net.*;
 import java.io.*;
@@ -79,15 +80,34 @@ class VentanaServer extends JFrame implements Runnable {
                     if (Character.isDigit(caracterEvaluado)) {
                         ArbolBinarioExp ABE = new ArbolBinarioExp(operacion);
                         solucionEnviar = ABE.evaluaAritmetica();
-                        operacionRecibida.setOperacion(" " + solucionEnviar);
+                        operacionRecibida.setResultado(" " + solucionEnviar);
                         break;
                     } else if (Character.isLetter(caracterEvaluado)) {
                         ArbolLogico ABEL = new ArbolLogico(operacion);
                         logicaEnviar = ABEL.evaluaLogico();
-                        operacionRecibida.setOperacion(" " + logicaEnviar);
+                        operacionRecibida.setResultado(" " + logicaEnviar);
                         break;
                     }
                 }
+
+                try{
+                    File file = new File("operacion.csv");
+                    FileWriter outputfile = new FileWriter(file);
+
+                    CSVWriter writer = new CSVWriter(outputfile);
+
+                    String[] header = {"Operacion","Resultado"};
+                    writer.writeNext(header);
+
+                    String[] data1 = {operacionRecibida.getOperacion(), operacionRecibida.getResultado()};
+                    writer.writeNext(data1);
+
+                    writer.close();
+                }
+                catch (IOException e){
+                    e.printStackTrace();
+                }
+
 
                 int port;
                 port = 9091;
