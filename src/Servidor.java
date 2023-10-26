@@ -270,9 +270,17 @@ class ArbolBinarioExp {
         for (int i = 0; i < cadena.length(); i++) {
             caracterEvaluado = cadena.charAt(i);
             token = new NodeArbol(caracterEvaluado);
-            if (Character.isDigit(caracterEvaluado)) {
+            if (Character.isDigit(caracterEvaluado) || caracterEvaluado == '.' ) {
                 StringBuilder numero = new StringBuilder();
-                while (i < cadena.length() && Character.isDigit(cadena.charAt(i))) {
+                boolean decimal = false;
+                while (i < cadena.length() && (Character.isDigit(cadena.charAt(i))|| cadena.charAt(i) == '.')) {
+                    char c = cadena.charAt(i);
+                    if (c=='.' && decimal){
+                        break;
+                    }
+                    if (c=='.'){
+                        decimal = true;
+                    }
                     numero.append(cadena.charAt(i));
                     i++;
                 }
