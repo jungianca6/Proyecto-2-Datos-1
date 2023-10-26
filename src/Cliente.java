@@ -15,8 +15,8 @@ import java.io.File;
 class VentanaCliente extends JFrame implements Runnable{
     private JPanel panelCliente;
     private JLabel Cliente;
-    private JTextField operacionA,resultadoA,operacionL,resultadoL;
-    private JButton solucionA,solucionL;
+    private JTextField operacionA,resultadoA;
+    private JButton solucionA;
 
     /**
      * constructor de la ventana
@@ -68,14 +68,6 @@ class VentanaCliente extends JFrame implements Runnable{
         resultadoA = new JTextField();
         resultadoA.setBounds(60,285,150,20);
         panelCliente.add(resultadoA);
-
-        operacionL = new JTextField();
-        operacionL.setBounds(250,325,150,20);
-        panelCliente.add(operacionL);
-
-        resultadoL = new JTextField();
-        resultadoL.setBounds(250,285,150,20);
-        panelCliente.add(resultadoL);
     }
 
     private void colocarBoton() {
@@ -84,10 +76,6 @@ class VentanaCliente extends JFrame implements Runnable{
         panelCliente.add(solucionA);
         solucionA.setEnabled(true);
 
-        solucionL = new JButton("Solución");
-        solucionL.setBounds(290, 370, 100, 30);
-        panelCliente.add(solucionL);
-        solucionL.setEnabled(true);
 
 
         ActionListener enviaOperacionA = new ActionListener() {
