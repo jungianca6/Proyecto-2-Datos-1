@@ -100,7 +100,7 @@ class VentanaCliente extends JFrame implements Runnable{
                     Socket misocket = new Socket("localhost",9090);
 
                     paqueteDatos operaciones = new paqueteDatos();
-                    operaciones.setAritmetica(operacionA.getText());
+                    operaciones.setOperacion(operacionA.getText());
 
                     ObjectOutputStream salidaOperacion = new ObjectOutputStream(misocket.getOutputStream());
                     salidaOperacion.writeObject(operaciones);
@@ -130,7 +130,7 @@ class VentanaCliente extends JFrame implements Runnable{
                     ObjectInputStream solucionRecibida = new ObjectInputStream(cliente.getInputStream());
 
                     packRecibido = (paqueteDatos) solucionRecibida.readObject();;
-                    resultadoA.setText(packRecibido.getAritmetica());
+                    resultadoA.setText(packRecibido.getOperacion());
                 }
             } catch (IOException | ClassNotFoundException e) {
                 //throw new RuntimeException(e);
@@ -140,28 +140,17 @@ class VentanaCliente extends JFrame implements Runnable{
 }
 
 class paqueteDatos implements Serializable{
-    private String aritmetica;
+    private String operacion;
 
-    public String getAritmetica() {
-        return aritmetica;
+    public String getOperacion() {
+        return operacion;
     }
 
-    public void setAritmetica(String aritmetica) {
-        this.aritmetica = aritmetica;
-    }
-}
-
-class paqueteLogica implements Serializable{
-    private String logica;
-
-    public String getLogica() {
-        return logica;
-    }
-
-    public void setLogica(String logica) {
-        this.logica = logica;
+    public void setOperacion(String aritmetica) {
+        this.operacion = aritmetica;
     }
 }
+
 
 public class Cliente {
     public static void main(String[] args) {

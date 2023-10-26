@@ -9,7 +9,7 @@ import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import java.io.File;
 
-class VentanaServer extends JFrame implements Runnable{
+class VentanaServer extends JFrame implements Runnable {
     private JPanel panelServidor;
     private JLabel Servidor;
 
@@ -32,38 +32,37 @@ class VentanaServer extends JFrame implements Runnable{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    private void componentesServer(){
+    private void componentesServer() {
         panelServidor();
         etiquetaServer();
     }
 
-    private void panelServidor(){
+    private void panelServidor() {
         panelServidor = new JPanel();
         panelServidor.setLayout(null);
         this.getContentPane().add(panelServidor);
     }
 
-    private void etiquetaServer(){
-        Servidor = new JLabel("Servidor",SwingConstants.CENTER);
+    private void etiquetaServer() {
+        Servidor = new JLabel("Servidor", SwingConstants.CENTER);
         panelServidor.add(Servidor);
-        Servidor.setBounds(50,15,100,25);
+        Servidor.setBounds(50, 15, 100, 25);
         Servidor.setForeground(Color.WHITE);
         Servidor.setBackground(Color.BLACK);
-        Servidor.setFont(new Font("times new roman", Font.PLAIN,20));
+        Servidor.setFont(new Font("times new roman", Font.PLAIN, 20));
         Servidor.setOpaque(true);
     }
+
     @Override
     public void run() {
         try {
             ServerSocket servidor = new ServerSocket(9090);
-            String aritmetica;
-            String logica;
-            double solucionEnviar;
+            String operacion;
+            Object solucionEnviar;
             boolean logicaEnviar;
             paqueteDatos operacionRecibida;
-            paqueteLogica logicaRecibida;
 
-            while(true) {
+            while (true) {
                 /**
                  *Permite que acepte las conexiones del exterior
                  */
@@ -73,32 +72,42 @@ class VentanaServer extends JFrame implements Runnable{
 
                 operacionRecibida = (paqueteDatos) operacionEntrante.readObject();
 
-                aritmetica = operacionRecibida.getAritmetica();
-                ArbolBinarioExp ABE = new ArbolBinarioExp(aritmetica);
-                solucionEnviar = ABE.evaluaAritmetica();
-                operacionRecibida.setAritmetica(" "+ solucionEnviar);
+                operacion = operacionRecibida.getOperacion();
 
+                for (int j = 0; j < operacion.length(); j++) {
+                    char caracterEvaluado = operacion.charAt(j);
+                    if (Character.isDigit(caracterEvaluado)) {
+                        ArbolBinarioExp ABE = new ArbolBinarioExp(operacion);
+                        solucionEnviar = ABE.evaluaAritmetica();
+                        operacionRecibida.setOperacion(" " + solucionEnviar);
+                        break;
+                    } else if (Character.isLetter(caracterEvaluado)) {
+                        ArbolLogico ABEL = new ArbolLogico(operacion);
+                        logicaEnviar = ABEL.evaluaLogico();
+                        operacionRecibida.setOperacion(" " + logicaEnviar);
+                        break;
+                    }
+                }
 
                 int port;
                 port = 9091;
-                for (int i =port; i<9100;i++){
+                for (int i = port; i < 9100; i++) {
                     try {
-                        Socket enviaDestinatario = new Socket("localhost",i);
+                        Socket enviaDestinatario = new Socket("localhost", i);
 
                         ObjectOutputStream reenvioSolucion = new ObjectOutputStream(enviaDestinatario.getOutputStream());
-                        reenvioSolucion.writeObject(operacionRecibida);
+                            reenvioSolucion.writeObject(operacionRecibida);
+                    } catch (IOException e) {
                     }
-                    catch (IOException e) {}
                 }
-                /**cierra el flujo de datos*/
-                misocket.close();
+                    /**cierra el flujo de datos*/
+                    misocket.close();
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 }
-
 class NodeArbol {
     protected Object data;
     protected NodeArbol left;
@@ -110,43 +119,38 @@ class NodeArbol {
     }
 }
 
-class NodePila{
+class NodePila {
     protected NodeArbol data;
     protected NodePila next;
 
-    public NodePila(NodeArbol x){
-        this.data = x;
-        next = null;
+    public NodePila(NodeArbol x) {
+            this.data = x;
+            next = null;
     }
 }
 
-class PilaArbolExp{
+class PilaArbolExp {
     private NodePila tope;
-
-    public PilaArbolExp(){
+    public PilaArbolExp() {
         tope = null;
     }
 
-    public void insertar (NodeArbol elemento){
+    public void insertar(NodeArbol elemento) {
         NodePila nuevo;
         nuevo = new NodePila(elemento);
         nuevo.next = tope;
         tope = nuevo;
     }
-
-    public boolean pilaVacia(){
+    public boolean pilaVacia() {
         return tope == null;
     }
+    public NodeArbol topePila() {
+            return tope.data;
+    }
 
-    public NodeArbol topePila(){
-        return tope.data;
-    }
-    public void ReiniciarPila(){
-        tope = null;
-    }
-    public NodeArbol quitar(){
+    public NodeArbol quitar() {
         NodeArbol aux = null;
-        if (!pilaVacia()){
+        if (!pilaVacia()) {
             aux = tope.data;
             tope = tope.next;
         }
@@ -154,83 +158,68 @@ class PilaArbolExp{
     }
 }
 
-class ArbolBinarioExp{
+class ArbolBinarioExp {
     NodeArbol raiz;
-
-    public ArbolBinarioExp(){
-        raiz= null;
+    public ArbolBinarioExp() {
+        raiz = null;
     }
 
     /**
      * crea el arbol de expresiones a partir de la cadena
      */
-    public ArbolBinarioExp(String cadena){
-        raiz = creaArbolBE(cadena);
+    public ArbolBinarioExp(String cadena) {
+            raiz = creaArbolBE(cadena);
     }
 
-    public void reiniciaArbol(){
-        raiz = null;
-    }
-
-    public void creaNodo(Object data){
-        raiz = new NodeArbol (data);
-    }
-    public NodeArbol creaSubArbol(NodeArbol dato2,NodeArbol dato1, NodeArbol operador){
-        operador.left= dato1;
-        operador.right= dato2;
+    public NodeArbol creaSubArbol(NodeArbol dato2, NodeArbol dato1, NodeArbol operador) {
+        operador.left = dato1;
+        operador.right = dato2;
         return operador;
     }
 
-    public boolean arbolVacio(){
-        return raiz == null;
-    }
-
-    private String inOrden(NodeArbol subArbol,String c){
+    private String inOrden(NodeArbol subArbol, String c) {
         String cadena;
         cadena = "";
-        if (subArbol != null){
-            cadena = c + inOrden(subArbol.left,c) + subArbol.data.toString() +"\n"+
-                    inOrden(subArbol.right,c);
+        if (subArbol != null) {
+            cadena = c + inOrden(subArbol.left, c) + subArbol.data.toString() + "\n" +
+                    inOrden(subArbol.right, c);
         }
         return cadena;
     }
 
-    public String toString(){
+    public String toString() {
         String cadena = "";
-        cadena = inOrden(raiz,cadena);
+        cadena = inOrden(raiz, cadena);
         return cadena;
     }
 
-    private int prioridad(char c){
-        int p=100;
-        switch (c){
+    private int prioridad(char c) {
+        int p = 100;
+        switch (c) {
             case '^':
-                p=30;
+                p = 30;
                 break;
             case '%':
-                p=25;
+                p = 25;
                 break;
             case '*':
             case '/':
-                p=20;
+                p = 20;
                 break;
             case '+':
             case '-':
-            case '&':
-            case '|':
-            case '~':
-            case '?':
-                p=10;
+                p = 10;
                 break;
             default:
-                p=0;
+                p = 0;
+
         }
         return p;
     }
 
-    private boolean esOperador(char c){
+    private boolean esOperador(char c) {
         boolean resultado;
-        switch(c){
+        switch (c) {
             case '(':
             case ')':
             case '^': //potencia
@@ -238,10 +227,6 @@ class ArbolBinarioExp{
             case '/':
             case '+':
             case '-':
-            case '&': //operador logico AND
-            case '|': //operador logico OR
-            case '~': //operador logico NOT
-            case '?': //operador logico XOR
             case '%':
                 resultado = true;
                 break;
@@ -251,7 +236,7 @@ class ArbolBinarioExp{
         return resultado;
     }
 
-    private NodeArbol creaArbolBE (String cadena){
+    private NodeArbol creaArbolBE(String cadena) {
         PilaArbolExp pilaOperadores;
         PilaArbolExp pilaExpresiones;
         NodeArbol token;
@@ -262,42 +247,32 @@ class ArbolBinarioExp{
         pilaOperadores = new PilaArbolExp();
         pilaExpresiones = new PilaArbolExp();
         char caracterEvaluado;
-        for (int i=0; i<cadena.length();i++){
+        for (int i = 0; i < cadena.length(); i++) {
             caracterEvaluado = cadena.charAt(i);
             token = new NodeArbol(caracterEvaluado);
-            if (Character.isDigit(caracterEvaluado)){
+            if (Character.isDigit(caracterEvaluado)) {
                 StringBuilder numero = new StringBuilder();
-                while (i<cadena.length() && Character.isDigit(cadena.charAt(i))){
+                while (i < cadena.length() && Character.isDigit(cadena.charAt(i))) {
                     numero.append(cadena.charAt(i));
                     i++;
                 }
                 i--;
                 NodeArbol numeroNodo = new NodeArbol(numero);
                 pilaExpresiones.insertar(numeroNodo);
-            }else if (Character.isLetter(caracterEvaluado)){
-                StringBuilder logico = new StringBuilder();
-                while (i<cadena.length() && Character.isLetter(cadena.charAt(i))){
-                    logico.append(cadena.charAt(i));
-                    i++;
-                }
-                i--;
-                NodeArbol logicoNodo = new NodeArbol(logico);
-                pilaExpresiones.insertar(logicoNodo);
-            }
-            else if (!esOperador(caracterEvaluado)){
+            } else if (!esOperador(caracterEvaluado)) {
 
-            }else{ /**es un operador*/
-                switch(caracterEvaluado){
+            } else { /**es un operador*/
+                switch (caracterEvaluado) {
                     case '(':
                         pilaOperadores.insertar(token);
                         break;
                     case ')':
                         while (!pilaOperadores.pilaVacia() &&
-                                !pilaOperadores.topePila().data.equals('(')){
+                                !pilaOperadores.topePila().data.equals('(')) {
                             op2 = pilaExpresiones.quitar();
                             op1 = pilaExpresiones.quitar();
                             op = pilaOperadores.quitar();
-                            op = creaSubArbol(op2,op1,op);
+                            op = creaSubArbol(op2, op1, op);
                             pilaExpresiones.insertar(op);
                         }
                         /**
@@ -307,28 +282,27 @@ class ArbolBinarioExp{
                         pilaOperadores.quitar();
                         break;
                     default:
-                        while(!pilaOperadores.pilaVacia() && prioridad(caracterEvaluado)
-                                <= prioridad(pilaOperadores.topePila().data.toString().charAt(0))){
+                        while (!pilaOperadores.pilaVacia() && prioridad(caracterEvaluado)
+                                <= prioridad(pilaOperadores.topePila().data.toString().charAt(0))) {
                             op2 = pilaExpresiones.quitar();
                             op1 = pilaExpresiones.quitar();
                             op = pilaOperadores.quitar();
-                            op = creaSubArbol(op2,op1,op);
+                            op = creaSubArbol(op2, op1, op);
                             pilaExpresiones.insertar(op);
                         }
                         pilaOperadores.insertar(token);
 
                 }
             }
-
         }
         /**
          * En el caso que la pila de operadores no este vacia
          */
-        while (!pilaOperadores.pilaVacia()){
+        while (!pilaOperadores.pilaVacia()) {
             op2 = pilaExpresiones.quitar();
             op1 = pilaExpresiones.quitar();
-            op= pilaOperadores.quitar();
-            op= creaSubArbol(op2,op1,op);
+            op = pilaOperadores.quitar();
+            op = creaSubArbol(op2, op1, op);
             pilaExpresiones.insertar(op);
         }
         /**
@@ -338,22 +312,19 @@ class ArbolBinarioExp{
         return op;
     }
 
-    public double evaluaAritmetica(){
-        return evalua(raiz);
+    public double evaluaAritmetica() {
+            return evalua(raiz);
     }
 
-    public boolean evaluaLogico(){
-        return evalualogico(raiz);
-    }
 
-    private double evalua(NodeArbol subarbol){
-        double acum=0;
-        if (!esOperador(subarbol.data.toString().charAt(0))){
-            return Double.parseDouble(subarbol.data.toString());
-        }else{
-            switch(subarbol.data.toString().charAt(0)){
+    private double evalua(NodeArbol subarbol) {
+        double acum = 0;
+        if (!esOperador(subarbol.data.toString().charAt(0))) {
+                return Double.parseDouble(subarbol.data.toString());
+        } else {
+            switch (subarbol.data.toString().charAt(0)) {
                 case '^':
-                    acum = acum + Math.pow(evalua(subarbol.left),evalua(subarbol.right));
+                    acum = acum + Math.pow(evalua(subarbol.left), evalua(subarbol.right));
                     break;
                 case '*':
                     acum = acum + evalua(subarbol.left) * evalua(subarbol.right);
@@ -368,35 +339,194 @@ class ArbolBinarioExp{
                     acum = acum + evalua(subarbol.left) - evalua(subarbol.right);
                     break;
                 case '%':
-                    acum= acum + (evalua(subarbol.left) * evalua(subarbol.right))/ 100;
+                    acum = acum + ((evalua(subarbol.left)) * evalua(subarbol.right)) / 100;
                     break;
-            }
+
+                }
         }
         return acum;
     }
+}
+class ArbolLogico {
+    NodeArbol raizlogica;
 
-    private boolean evalualogico(NodeArbol subarbol){
-        boolean logico= false;
-        if (!esOperador(subarbol.data.toString().charAt(0))){
+    public ArbolLogico() {
+        this.raizlogica = null;
+    }
+
+    public ArbolLogico(String cadena) {
+        raizlogica = creaArbolLogicoBE(cadena);
+    }
+
+    public NodeArbol creaSubArbol(NodeArbol dato2, NodeArbol dato1, NodeArbol operador) {
+        operador.left = dato1;
+        operador.right = dato2;
+        return operador;
+    }
+
+    private String inOrden(NodeArbol subArbol, String c) {
+        String cadena;
+        cadena = "";
+        if (subArbol != null) {
+            cadena = c + inOrden(subArbol.left, c) + subArbol.data.toString() + "\n" +
+                    inOrden(subArbol.right, c);
+        }
+        return cadena;
+    }
+
+    public String toString() {
+        String cadena = "";
+        cadena = inOrden(raizlogica, cadena);
+        return cadena;
+    }
+
+    private int prioridad(char c) {
+        int p = 100;
+        switch (c) {
+            case '^':
+                    p = 30;
+                    break;
+            case '%':
+                    p = 25;
+                    break;
+            case '*':
+            case '/':
+                    p = 20;
+                    break;
+            case '+':
+            case '-':
+            case '&':
+            case '|':
+            case '~':
+            case '?':
+                p = 10;
+                break;
+            default:
+                p = 0;
+        }
+        return p;
+    }
+
+    private boolean esOperador(char c) {
+        boolean resultado;
+        switch (c) {
+            case '&': //operador logico AND
+            case '|': //operador logico OR
+            case '~': //operador logico NOT
+            case '?': //operador logico XOR
+            case '%':
+                resultado = true;
+                break;
+            default:
+                resultado = false;
+        }
+            return resultado;
+    }
+
+    private NodeArbol creaArbolLogicoBE(String cadena) {
+        PilaArbolExp pilaOperadores;
+        PilaArbolExp pilaExpresiones;
+        NodeArbol token;
+        NodeArbol op1;
+        NodeArbol op2;
+        NodeArbol op;
+
+        pilaOperadores = new PilaArbolExp();
+        pilaExpresiones = new PilaArbolExp();
+        char caracterEvaluado;
+        for (int i = 0; i < cadena.length(); i++) {
+            caracterEvaluado = cadena.charAt(i);
+            token = new NodeArbol(caracterEvaluado);
+            if (Character.isLetter(caracterEvaluado)) {
+                StringBuilder logico = new StringBuilder();
+                while (i < cadena.length() && Character.isLetter(cadena.charAt(i))) {
+                    logico.append(cadena.charAt(i));
+                    i++;
+                }
+                i--;
+                NodeArbol logicoNodo = new NodeArbol(logico);
+                pilaExpresiones.insertar(logicoNodo);
+            } else if (!esOperador(caracterEvaluado)) {
+
+            } else { /**es un operador*/
+                switch (caracterEvaluado) {
+                    case '(':
+                            pilaOperadores.insertar(token);
+                            break;
+                    case ')':
+                        while (!pilaOperadores.pilaVacia() &&
+                                !pilaOperadores.topePila().data.equals('(')) {
+                            op2 = pilaExpresiones.quitar();
+                            op1 = pilaExpresiones.quitar();
+                            op = pilaOperadores.quitar();
+                            op = creaSubArbol(op2, op1, op);
+                            pilaExpresiones.insertar(op);
+                        }
+                        /**
+                         * Lo quitamos de la pila de operadores, porque
+                         * el parentesis no forma parte de nuestra expresión
+                         */
+                        pilaOperadores.quitar();
+                        break;
+                    default:
+                        while (!pilaOperadores.pilaVacia() && prioridad(caracterEvaluado)
+                                <= prioridad(pilaOperadores.topePila().data.toString().charAt(0))) {
+                            op2 = pilaExpresiones.quitar();
+                            op1 = pilaExpresiones.quitar();
+                            op = pilaOperadores.quitar();
+                            op = creaSubArbol(op2, op1, op);
+                            pilaExpresiones.insertar(op);
+                        }
+                        pilaOperadores.insertar(token);
+
+                }
+            }
+
+        }
+        /**
+         * En el caso que la pila de operadores no este vacia
+         */
+        while (!pilaOperadores.pilaVacia()) {
+            op2 = pilaExpresiones.quitar();
+            op1 = pilaExpresiones.quitar();
+            op = pilaOperadores.quitar();
+            op = creaSubArbol(op2, op1, op);
+            pilaExpresiones.insertar(op);
+        }
+        /**
+         * Al final se retorna el arbol completo de expresiones
+         */
+        op = pilaExpresiones.quitar();
+        return op;
+    }
+
+    public boolean evaluaLogico() {
+        return evalualogico(raizlogica);
+    }
+
+    private boolean evalualogico(NodeArbol subarbol) {
+        boolean acum = false;
+        char caracter = subarbol.data.toString().charAt(0);
+        if (!esOperador(subarbol.data.toString().charAt(0)) && Character.isLetter(caracter)) {
             return Boolean.parseBoolean(subarbol.data.toString());
-        }else{
-            switch(subarbol.data.toString().charAt(0)){
+        } else {
+            switch (subarbol.data.toString().charAt(0)) {
                 case '&':
-                    logico = evalualogico(subarbol.left) && evalualogico(subarbol.right);
+                    acum = evalualogico(subarbol.left) && evalualogico(subarbol.right);
                     break;
                 case '|':
-                    logico = evalualogico(subarbol.left) || evalualogico(subarbol.right);
+                    acum = evalualogico(subarbol.left) || evalualogico(subarbol.right);
                     break;
                 case '~':
-                    logico = !evalualogico(subarbol.right);
+                    acum = !evalualogico(subarbol.right);
                     break;
                 case '?':
-                    logico = evalualogico(subarbol.left) ^ evalualogico(subarbol.right);
+                    acum = evalualogico(subarbol.left) ^ evalualogico(subarbol.right);
                     break;
 
             }
         }
-        return logico;
+        return acum;
     }
 }
 
