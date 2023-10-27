@@ -4,6 +4,7 @@ import java.net.*;
 import java.io.*;
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sourceforge.tess4j.ITesseract;
@@ -90,23 +91,30 @@ class VentanaServer extends JFrame implements Runnable {
                     }
                 }
 
-                try{
-                    File file = new File("operacion.csv");
-                    FileWriter outputfile = new FileWriter(file);
+                // Registrar la operación en un archivo .csv
+                try {
+                    File file = new File("registro_operaciones.csv");
+                    FileWriter outputfile;
+                    if (file.exists()) {
+                        outputfile = new FileWriter(file, true);
+                    } else {
+                        outputfile = new FileWriter(file);
+                        CSVWriter writer = new CSVWriter(outputfile);
 
+                        String[] header = {"Expresión", "Resultado", "Fecha"};
+                        writer.writeNext(header);
+                    }
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String[] data = {operacionRecibida.getOperacion(), operacionRecibida.getResultado(), sdf.format(new Date())};
                     CSVWriter writer = new CSVWriter(outputfile);
-
-                    String[] header = {"Operacion","Resultado"};
-                    writer.writeNext(header);
-
-                    String[] data1 = {operacionRecibida.getOperacion(), operacionRecibida.getResultado()};
-                    writer.writeNext(data1);
+                    writer.writeNext(data);
 
                     writer.close();
-                }
-                catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
+
 
 
                 int port;
@@ -270,10 +278,10 @@ class ArbolBinarioExp {
         for (int i = 0; i < cadena.length(); i++) {
             caracterEvaluado = cadena.charAt(i);
             token = new NodeArbol(caracterEvaluado);
-            if (Character.isDigit(caracterEvaluado) || caracterEvaluado == '.' ) {
+            if (Character.isDigit(caracterEvaluado) || caracterEvaluado == '.') {
                 StringBuilder numero = new StringBuilder();
                 boolean decimal = false;
-                while (i < cadena.length() && (Character.isDigit(cadena.charAt(i))|| cadena.charAt(i) == '.')) {
+                while (i < cadena.length() && (Character.isDigit(cadena.charAt(i))|| cadena.charAt(i) == '.')){
                     char c = cadena.charAt(i);
                     if (c=='.' && decimal){
                         break;
@@ -346,30 +354,43 @@ class ArbolBinarioExp {
 
 
     private double evalua(NodeArbol subarbol) {
+        /*if (subarbol == null) {
+            switch (){
+                case '*':
+                case '/':
+                    return (-1);
+                default:
+                    return 0;
+            }
+        }
+        */
         double acum = 0;
         if (!esOperador(subarbol.data.toString().charAt(0))) {
                 return Double.parseDouble(subarbol.data.toString());
         } else {
             switch (subarbol.data.toString().charAt(0)) {
                 case '^':
-                    acum = acum + Math.pow(evalua(subarbol.left), evalua(subarbol.right));
+                    acum = Math.pow(evalua(subarbol.left), evalua(subarbol.right));
                     break;
                 case '*':
-                    acum = acum + evalua(subarbol.left) * evalua(subarbol.right);
+                    acum = evalua(subarbol.left) * evalua(subarbol.right);
                     break;
                 case '/':
-                    acum = acum + evalua(subarbol.left) / evalua(subarbol.right);
+                    acum = evalua(subarbol.left) / evalua(subarbol.right);
                     break;
                 case '+':
-                    acum = acum + evalua(subarbol.left) + evalua(subarbol.right);
+                    acum = evalua(subarbol.left) + evalua(subarbol.right);
                     break;
                 case '-':
-                    acum = acum + evalua(subarbol.left) - evalua(subarbol.right);
+                    if (subarbol.left != null && subarbol.right!=null){
+                        acum = evalua(subarbol.left) - evalua(subarbol.right);
+                    }else if (subarbol.right != null) {
+                        acum = -evalua(subarbol.right);
+                    }
                     break;
                 case '%':
-                    acum = acum + ((evalua(subarbol.left)) * evalua(subarbol.right)) / 100;
+                    acum =  ((evalua(subarbol.left)) * evalua(subarbol.right)) / 100;
                     break;
-
                 }
         }
         return acum;
