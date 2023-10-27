@@ -115,8 +115,6 @@ class VentanaServer extends JFrame implements Runnable {
                     e.printStackTrace();
                 }
 
-
-
                 int port;
                 port = 9091;
                 for (int i = port; i < 9100; i++) {
@@ -267,7 +265,7 @@ class ArbolBinarioExp {
     private NodeArbol creaArbolBE(String cadena) {
         PilaArbolExp pilaOperadores;
         PilaArbolExp pilaExpresiones;
-        NodeArbol token;
+        NodeArbol token,token1;
         NodeArbol op1;
         NodeArbol op2;
         NodeArbol op;
@@ -275,9 +273,19 @@ class ArbolBinarioExp {
         pilaOperadores = new PilaArbolExp();
         pilaExpresiones = new PilaArbolExp();
         char caracterEvaluado;
+        char caracteranterior;
+        String valor = "";
+
         for (int i = 0; i < cadena.length(); i++) {
             caracterEvaluado = cadena.charAt(i);
+            caracteranterior = 0;
             token = new NodeArbol(caracterEvaluado);
+            token1 = new NodeArbol(valor);
+
+            if (i>=1){
+                caracteranterior =cadena.charAt(i-1);
+            }
+
             if (Character.isDigit(caracterEvaluado) || caracterEvaluado == '.') {
                 StringBuilder numero = new StringBuilder();
                 boolean decimal = false;
@@ -296,6 +304,7 @@ class ArbolBinarioExp {
                 NodeArbol numeroNodo = new NodeArbol(numero);
                 pilaExpresiones.insertar(numeroNodo);
             } else if (!esOperador(caracterEvaluado)) {
+                valor += caracterEvaluado;
 
             } else { /**es un operador*/
                 switch (caracterEvaluado) {
@@ -318,6 +327,16 @@ class ArbolBinarioExp {
                         pilaOperadores.quitar();
                         break;
                     default:
+                        if (caracterEvaluado == '+'){
+                        }
+                        if (caracterEvaluado == '-'){
+                            if (!(caracteranterior == ')')){
+                                if (valor.equals("")){
+                                    token1 = new NodeArbol(0);
+                                    pilaExpresiones.insertar(token1);
+                                }
+                            }
+                        }
                         while (!pilaOperadores.pilaVacia() && prioridad(caracterEvaluado)
                                 <= prioridad(pilaOperadores.topePila().data.toString().charAt(0))) {
                             op2 = pilaExpresiones.quitar();
@@ -354,20 +373,11 @@ class ArbolBinarioExp {
 
 
     private double evalua(NodeArbol subarbol) {
-        /*if (subarbol == null) {
-            switch (){
-                case '*':
-                case '/':
-                    return (-1);
-                default:
-                    return 0;
-            }
-        }
-        */
         double acum = 0;
         if (!esOperador(subarbol.data.toString().charAt(0))) {
                 return Double.parseDouble(subarbol.data.toString());
-        } else {
+        }
+        else {
             switch (subarbol.data.toString().charAt(0)) {
                 case '^':
                     acum = Math.pow(evalua(subarbol.left), evalua(subarbol.right));
@@ -382,11 +392,7 @@ class ArbolBinarioExp {
                     acum = evalua(subarbol.left) + evalua(subarbol.right);
                     break;
                 case '-':
-                    if (subarbol.left != null && subarbol.right!=null){
-                        acum = evalua(subarbol.left) - evalua(subarbol.right);
-                    }else if (subarbol.right != null) {
-                        acum = -evalua(subarbol.right);
-                    }
+                    acum = evalua(subarbol.left) - evalua(subarbol.right);
                     break;
                 case '%':
                     acum =  ((evalua(subarbol.left)) * evalua(subarbol.right)) / 100;
