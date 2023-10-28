@@ -759,6 +759,9 @@ class ArbolLogico {
     }
 }
 
+/**
+ * Constructor e instanciador de la clase Servidor
+ */
 public class Servidor {
     public static void main(String[] args) {
         VentanaServer servidor = new VentanaServer();

@@ -23,10 +23,25 @@ import org.opencv.videoio.VideoCapture;
  */
 public class Camera extends JFrame {
 
+    /**
+     * Vista de la camara
+     */
     private JLabel cameraScreen;
+    /**
+     * Boton que captura la foto
+     */
     private JButton btnCapture;
+    /**
+     * Captura video desde una camara
+     */
     private VideoCapture capture;
+    /**
+     * Matriz para almacenar la imagen capturada
+     */
     private Mat image;
+    /**
+     * Indica si se ha hecho click al boton de captura
+     */
     private boolean clicked = false;
 
     /**
