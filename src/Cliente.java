@@ -11,24 +11,38 @@ import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import java.io.File;
 
-
+/**
+ * Esta clase crea la ventana de la interfaz gráfica del servidor
+ */
 class VentanaCliente extends JFrame implements Runnable{
+
+    /**
+     * El panel de la interfaz que permite colocar los otros componentes
+     */
     private JPanel panelCliente;
+    /**
+     * La etiqueta de titulo del servidor
+     */
     private JLabel Cliente;
+    /**
+     * Los campos de texto de la interfaz del cliente
+     */
     private JTextField operacionA,resultadoA;
+    /**
+     * El botón que resuelve la operación
+     */
     private JButton solucionA;
 
     /**
-     * constructor de la ventana
+     * Constructor de la ventana
      */
-
     public VentanaCliente() {
         this.setBounds(600, 200, 450, 450);
         setTitle("Cliente");
 
         ComponentesCliente();
 
-        /**
+        /*
          * construimos el hilo para que siempre escuche
          */
         Thread mihilo = new Thread(this);
@@ -37,6 +51,9 @@ class VentanaCliente extends JFrame implements Runnable{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
+    /**
+     * Añade los componentes a la interfaz
+     */
     private void ComponentesCliente(){
         panelCliente();
         etiquetaCliente();
@@ -44,6 +61,9 @@ class VentanaCliente extends JFrame implements Runnable{
         colocarBoton();
     }
 
+    /**
+     * Crea el panel de la interfaz del cliente
+     */
     private void panelCliente(){
         panelCliente = new JPanel();
         panelCliente.setLayout(null);
@@ -60,6 +80,9 @@ class VentanaCliente extends JFrame implements Runnable{
         Cliente.setOpaque(true);
     }
 
+    /**
+     * Crea las cajas de texto de la interfaz del cliente
+     */
     private void colocarCajadeTexto(){
         operacionA = new JTextField();
         operacionA.setBounds(60,325,150,20);
@@ -70,13 +93,14 @@ class VentanaCliente extends JFrame implements Runnable{
         panelCliente.add(resultadoA);
     }
 
+    /**
+     * Crea el botón de la interfaz del cliente
+     */
     private void colocarBoton() {
         solucionA = new JButton("Solución");
         solucionA.setBounds(90, 370, 100, 30);
         panelCliente.add(solucionA);
         solucionA.setEnabled(true);
-
-
 
         ActionListener enviaOperacionA = new ActionListener() {
             @Override
@@ -103,6 +127,10 @@ class VentanaCliente extends JFrame implements Runnable{
 
     }
 
+    /**
+     * Método que permite la comunicacion y envío de datos
+     * entre servidor y cliente
+     */
     @Override
     public void run() {
         int port;
@@ -126,6 +154,11 @@ class VentanaCliente extends JFrame implements Runnable{
         }
     }
 }
+
+/**
+ * Esta clase serializa los datos en bits,
+ * el cual permite que puedan ser enviados por medio de los sockets
+ */
 
 class paqueteDatos implements Serializable{
     private String operacion,resultado;

@@ -11,21 +11,30 @@ import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import java.io.File;
 
+/**
+ * Esta clase crea la ventana de la interfaz gráfica del servidor
+ */
 class VentanaServer extends JFrame implements Runnable {
+
+    /**
+     * El panel de la interfaz que permite colocar los otros componentes
+     */
     private JPanel panelServidor;
+    /**
+     * La etiqueta de titulo del servidor
+     */
     private JLabel Servidor;
 
     /**
-     * constructor de la ventana
+     * Constructor de la ventana
      */
-
     public VentanaServer() {
         this.setBounds(500, 200, 300, 300);
         setTitle("Servidor");
 
         componentesServer();
 
-        /**
+        /*
          * construimos el hilo para que siempre escuche
          */
         Thread mihilo = new Thread(this);
@@ -34,17 +43,26 @@ class VentanaServer extends JFrame implements Runnable {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
+    /**
+     * Añade los componentes a la interfaz
+     */
     private void componentesServer() {
         panelServidor();
         etiquetaServer();
     }
 
+    /**
+     * Crea el panel de la interfaz del servidor
+     */
     private void panelServidor() {
         panelServidor = new JPanel();
         panelServidor.setLayout(null);
         this.getContentPane().add(panelServidor);
     }
 
+    /**
+     * Crea las etiquetas de la interfaz del servidor
+     */
     private void etiquetaServer() {
         Servidor = new JLabel("Servidor", SwingConstants.CENTER);
         panelServidor.add(Servidor);
@@ -55,6 +73,10 @@ class VentanaServer extends JFrame implements Runnable {
         Servidor.setOpaque(true);
     }
 
+    /**
+     * Método que permite la comunicacion y envío de datos
+     * entre servidor y cliente
+     */
     @Override
     public void run() {
         try {
@@ -65,7 +87,7 @@ class VentanaServer extends JFrame implements Runnable {
             paqueteDatos operacionRecibida;
 
             while (true) {
-                /**
+                /*
                  *Permite que acepte las conexiones del exterior
                  */
                 Socket misocket = servidor.accept();
@@ -126,7 +148,7 @@ class VentanaServer extends JFrame implements Runnable {
                     } catch (IOException e) {
                     }
                 }
-                    /**cierra el flujo de datos*/
+                    /*cierra el flujo de datos*/
                     misocket.close();
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -134,45 +156,105 @@ class VentanaServer extends JFrame implements Runnable {
         }
     }
 }
+
+/**
+ * Esta clase construye los nodos del árbol de expresión
+ */
 class NodeArbol {
+    /**
+     * El dato dentro del nodo
+     */
     protected Object data;
+    /**
+     * El hijo izquierdo de un nodo
+     */
     protected NodeArbol left;
+    /**
+     * El hijo derecho de un nodo
+     */
     protected NodeArbol right;
 
+    /**
+     * Constructor de la clase NodeArbol
+     * @param data El dato a insertar dentro del nodo
+     */
     public NodeArbol(Object data) {
         this.data = data;
         left = right = null;
     }
 }
 
+/**
+ * Esta clase construye y define los nodos de las pilas/stacks.
+ */
 class NodePila {
+
+    /**
+     * Define el dato de la pila
+     */
     protected NodeArbol data;
+    /**
+     * Puntero de los nodos en la pila
+     */
     protected NodePila next;
 
+    /**
+     * Constructor del nodo de la pila
+     * @param x Dato del nodo
+     */
     public NodePila(NodeArbol x) {
             this.data = x;
             next = null;
     }
 }
 
+/**
+ *Clase que maneja las pilas de los datos del árbol.
+ */
 class PilaArbolExp {
+    /**
+     * Primer elemento de la pila.
+     */
     private NodePila tope;
+
+    /**
+     * Constructor de la clase
+     */
     public PilaArbolExp() {
         tope = null;
     }
 
+    /**
+     * El método añade elementos al tope de la pila
+     * @param elemento Dato que se desea añadir a la pila.
+     */
     public void insertar(NodeArbol elemento) {
         NodePila nuevo;
         nuevo = new NodePila(elemento);
         nuevo.next = tope;
         tope = nuevo;
     }
+
+    /**
+     * Método booleano que verifica si la pila no tiene elementos
+     * @return Booleano de si la pila stá vacía
+     */
     public boolean pilaVacia() {
         return tope == null;
     }
+
+    /**
+     * Método que encuentra el tope de la lista
+     * @return El primer elemento de la lista
+     */
     public NodeArbol topePila() {
             return tope.data;
     }
+
+    /**
+     * Elimina el tope de la pila
+     * @return el elemento quitado de la lista
+     */
 
     public NodeArbol quitar() {
         NodeArbol aux = null;
@@ -184,25 +266,47 @@ class PilaArbolExp {
     }
 }
 
+/**
+ * Crea un árbol de expresión cuando es una operación aritmética,
+ * asi como su solución.
+ */
+
 class ArbolBinarioExp {
+    /**
+     * La raíz del árbol de expresión
+     */
     NodeArbol raiz;
     public ArbolBinarioExp() {
         raiz = null;
     }
 
     /**
-     * crea el arbol de expresiones a partir de la cadena
+     * Constructor de la clase. Define el valor de la raíz del árbol
+     * @param cadena La operación recibida por parte del cliente
      */
     public ArbolBinarioExp(String cadena) {
             raiz = creaArbolBE(cadena);
     }
 
+    /**
+     * Método que crea un subarbol en el árbol.
+     * @param dato2 Hijo derecho
+     * @param dato1 Hijo izquierdo
+     * @param operador Raíz del subárbol
+     * @return El operador que sirve como raíz del subarbol
+     */
     public NodeArbol creaSubArbol(NodeArbol dato2, NodeArbol dato1, NodeArbol operador) {
         operador.left = dato1;
         operador.right = dato2;
         return operador;
     }
 
+    /**
+     * Lee una cadena de texto en
+     * @param subArbol El subarbol que se va a recorrer
+     * @param c El string que se va a recorrer
+     * @return La cadena recorrida
+     */
     private String inOrden(NodeArbol subArbol, String c) {
         String cadena;
         cadena = "";
@@ -213,12 +317,21 @@ class ArbolBinarioExp {
         return cadena;
     }
 
+    /**
+     * Método devuelve una representacion textual del Objeto
+     * @return La cadena de texto recorrida
+     */
     public String toString() {
         String cadena = "";
         cadena = inOrden(raiz, cadena);
         return cadena;
     }
 
+    /**
+     * Define la prioridad de los operadores, siguiendo la regla PEMDAS
+     * @param c El operador evaluado
+     * @return La prioridad de ese operador
+     */
     private int prioridad(char c) {
         int p = 100;
         switch (c) {
@@ -243,6 +356,11 @@ class ArbolBinarioExp {
         return p;
     }
 
+    /**
+     * Define si el caracter evaluado es un operador
+     * @param c El caracter evaluado
+     * @return Booleano que determina si es operador
+     */
     private boolean esOperador(char c) {
         boolean resultado;
         switch (c) {
@@ -262,7 +380,13 @@ class ArbolBinarioExp {
         return resultado;
     }
 
+    /**
+     * Crea el Arbol de expresión aritmético
+     * @param cadena La operación aritmética recibida por el cliente
+     * @return El árbol de expresión
+     */
     private NodeArbol creaArbolBE(String cadena) {
+
         PilaArbolExp pilaOperadores;
         PilaArbolExp pilaExpresiones;
         NodeArbol token,token1;
@@ -306,7 +430,7 @@ class ArbolBinarioExp {
             } else if (!esOperador(caracterEvaluado)) {
                 valor += caracterEvaluado;
 
-            } else { /**es un operador*/
+            } else { /*es un operador*/
                 switch (caracterEvaluado) {
                     case '(':
                         pilaOperadores.insertar(token);
@@ -320,7 +444,7 @@ class ArbolBinarioExp {
                             op = creaSubArbol(op2, op1, op);
                             pilaExpresiones.insertar(op);
                         }
-                        /**
+                        /*
                          * Lo quitamos de la pila de operadores, porque
                          * el parentesis no forma parte de nuestra expresión
                          */
@@ -350,7 +474,7 @@ class ArbolBinarioExp {
                 }
             }
         }
-        /**
+        /*
          * En el caso que la pila de operadores no este vacia
          */
         while (!pilaOperadores.pilaVacia()) {
@@ -360,18 +484,26 @@ class ArbolBinarioExp {
             op = creaSubArbol(op2, op1, op);
             pilaExpresiones.insertar(op);
         }
-        /**
+        /*
          * Al final se retorna el arbol completo de expresiones
          */
         op = pilaExpresiones.quitar();
         return op;
     }
 
+    /**
+     * Método que recoge el resultado
+     * @return Solución de la operación
+     */
     public double evaluaAritmetica() {
             return evalua(raiz);
     }
 
-
+    /**
+     * Resuelve la operación matemática
+     * @param subarbol El subarbol que comenzará la evaluación y solución de la operación
+     * @return El resultado de la operación
+     */
     private double evalua(NodeArbol subarbol) {
         double acum = 0;
         if (!esOperador(subarbol.data.toString().charAt(0))) {
@@ -402,23 +534,49 @@ class ArbolBinarioExp {
         return acum;
     }
 }
+
+/**
+ * Crea un árbol de expresión cuando es una operación lógica,
+ * asi como su solución.
+ */
 class ArbolLogico {
+    /**
+     * La raíz del árbol de expresión
+     */
     NodeArbol raizlogica;
 
     public ArbolLogico() {
         this.raizlogica = null;
     }
 
+    /**
+     * Constructor de la clase. Define el valor de la raíz del árbol
+     * @param cadena La operación recibida por parte del cliente
+     */
+
     public ArbolLogico(String cadena) {
         raizlogica = creaArbolLogicoBE(cadena);
     }
 
+    /**
+     * Método que crea un subarbol en el árbol.
+     * @param dato2 Hijo derecho
+     * @param dato1 Hijo izquierdo
+     * @param operador Raíz del subárbol
+     * @return El operador que sirve como raíz del subarbol
+     */
     public NodeArbol creaSubArbol(NodeArbol dato2, NodeArbol dato1, NodeArbol operador) {
         operador.left = dato1;
         operador.right = dato2;
         return operador;
     }
 
+    /**
+     * Lee una cadena de texto en
+     * @param subArbol El subarbol que se va a recorrer
+     * @param c El string que se va a recorrer
+     * @return La cadena recorrida
+     */
     private String inOrden(NodeArbol subArbol, String c) {
         String cadena;
         cadena = "";
@@ -429,27 +587,24 @@ class ArbolLogico {
         return cadena;
     }
 
+    /**
+     * Método devuelve una representacion textual del Objeto
+     * @return La cadena de texto recorrida
+     */
     public String toString() {
         String cadena = "";
         cadena = inOrden(raizlogica, cadena);
         return cadena;
     }
 
+    /**
+     * Define la prioridad de los operadores lógicos
+     * @param c El operador evaluado
+     * @return La prioridad de ese operador
+     */
     private int prioridad(char c) {
         int p = 100;
         switch (c) {
-            case '^':
-                    p = 30;
-                    break;
-            case '%':
-                    p = 25;
-                    break;
-            case '*':
-            case '/':
-                    p = 20;
-                    break;
-            case '+':
-            case '-':
             case '&':
             case '|':
             case '~':
@@ -462,6 +617,11 @@ class ArbolLogico {
         return p;
     }
 
+    /**
+     * Define si el caracter evaluado es un operador lógico
+     * @param c El caracter evaluado
+     * @return Booleano que determina si es operador lógico
+     */
     private boolean esOperador(char c) {
         boolean resultado;
         switch (c) {
@@ -478,6 +638,11 @@ class ArbolLogico {
             return resultado;
     }
 
+    /**
+     * Crea el Arbol de expresión lógico
+     * @param cadena La operación lógico recibida por el cliente
+     * @return El árbol de expresión
+     */
     private NodeArbol creaArbolLogicoBE(String cadena) {
         PilaArbolExp pilaOperadores;
         PilaArbolExp pilaExpresiones;
@@ -538,7 +703,7 @@ class ArbolLogico {
             }
 
         }
-        /**
+        /*
          * En el caso que la pila de operadores no este vacia
          */
         while (!pilaOperadores.pilaVacia()) {
@@ -548,17 +713,26 @@ class ArbolLogico {
             op = creaSubArbol(op2, op1, op);
             pilaExpresiones.insertar(op);
         }
-        /**
+        /*
          * Al final se retorna el arbol completo de expresiones
          */
         op = pilaExpresiones.quitar();
         return op;
     }
 
+    /**
+     * Método que recoge el resultado
+     * @return Solución de la operación
+     */
     public boolean evaluaLogico() {
         return evalualogico(raizlogica);
     }
 
+    /**
+     * Resuelve la operación lógica
+     * @param subarbol El subarbol que comenzará la evaluación y solución de la operación
+     * @return El resultado de la operación
+     */
     private boolean evalualogico(NodeArbol subarbol) {
         boolean acum = false;
         char caracter = subarbol.data.toString().charAt(0);
@@ -584,7 +758,6 @@ class ArbolLogico {
         return acum;
     }
 }
-
 
 public class Servidor {
     public static void main(String[] args) {
