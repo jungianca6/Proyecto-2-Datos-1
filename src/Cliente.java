@@ -30,9 +30,9 @@ class VentanaCliente extends JFrame implements Runnable{
      */
     private JTextField operacionA,resultadoA;
     /**
-     * El botón que resuelve la operación
+     * Botones de la interfaz
      */
-    private JButton solucionA;
+    private JButton solucionA,OCR;
 
     /**
      * Constructor de la ventana
@@ -100,6 +100,8 @@ class VentanaCliente extends JFrame implements Runnable{
     private void colocarBoton() {
         solucionA = new JButton("Solución");
         solucionA.setBounds(90, 370, 100, 30);
+        OCR = new JButton("OCR");
+        OCR.setBounds(150,370,100,30);
         panelCliente.add(solucionA);
         solucionA.setEnabled(true);
 
@@ -126,6 +128,18 @@ class VentanaCliente extends JFrame implements Runnable{
         };
         solucionA.addActionListener(enviaOperacionA);
 
+    }
+
+    private void realizarOCR() {
+        Tesseract tesseract = new Tesseract();
+        try {
+            tesseract.setDatapath("C:\\Users\\jungi\\Desktop\\Tesseract\\Tess4J-3.4.8-src\\Tess4J\\tessdata");
+            String text = tesseract.doOCR(new File("test.png"));
+            resultadoA.setText(text);
+        } catch (TesseractException e) {
+            e.printStackTrace();
+            resultadoA.setText("Error en el OCR");
+        }
     }
 
     /**
@@ -181,6 +195,8 @@ class paqueteDatos implements Serializable{
         this.operacion = aritmetica;
     }
 }
+
+
 
 
 public class Cliente {
