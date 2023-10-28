@@ -81,48 +81,10 @@ public class Camera extends JFrame {
 
                 String imagePath = System.getProperty("user.dir") + "/" + name + ".jpg";
                 Imgcodecs.imwrite(imagePath, image);
-
-                // Recognize text and evaluate the mathematical expression
-                processSavedImage(imagePath);
-
                 clicked = false;
             }
         }
     }
-
-    private void processSavedImage(String imagePath) {
-        // Recognize text using Tesseract OCR
-        String recognizedText = recognizeText(imagePath);
-        System.out.println("Recognized text: " + recognizedText);
-
-        // Evaluate the mathematical expression
-        double result = evaluateExpression(recognizedText);
-        System.out.println("Result: " + result);
-    }
-
-    private String recognizeText(String imagePath) {
-        ITesseract tesseract = new Tesseract();
-
-        try {
-            tesseract.setDatapath("path/to/tessdata");
-            return tesseract.doOCR(new File(imagePath));
-        } catch (TesseractException e) {
-            e.printStackTrace();
-            return "Error during OCR";
-        }
-    }
-
-    private double evaluateExpression(String expression) {
-        try {
-            Expression e = new ExpressionBuilder(expression)
-                    .build();
-            return e.evaluate();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Double.NaN; // Indicate error in evaluation
-        }
-    }
-
     public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         EventQueue.invokeLater(new Runnable() {
