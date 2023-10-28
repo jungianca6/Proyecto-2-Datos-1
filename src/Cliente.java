@@ -9,6 +9,7 @@ import java.awt.*;
 
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
 import java.io.File;
 
 /**
@@ -154,6 +155,7 @@ class VentanaCliente extends JFrame implements Runnable{
         }
     }
 }
+
 
 /**
  * Esta clase serializa los datos en bits,

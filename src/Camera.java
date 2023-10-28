@@ -15,7 +15,12 @@ import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.VideoCapture;
 
-
+/**
+ * La clase Camera representa una aplicación Java que permite capturar imágenes
+ * desde una cámara de video utilizando OpenCV y guardarlas en archivos JPEG.
+ * Proporciona una interfaz de usuario simple con un botón "Capture" para
+ * capturar imágenes y mostrar el flujo de la cámara en una ventana.
+ */
 public class Camera extends JFrame {
 
     private JLabel cameraScreen;
@@ -24,6 +29,11 @@ public class Camera extends JFrame {
     private Mat image;
     private boolean clicked = false;
 
+    /**
+     * Constructor de la clase Camera. Inicializa la interfaz de usuario y
+     * configura los componentes como la pantalla de la cámara y el botón de
+     * captura.
+     */
     public Camera() {
         setLayout(null);
 
@@ -48,6 +58,10 @@ public class Camera extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Inicia la cámara, captura imágenes continuamente y permite al usuario
+     * guardar las imágenes capturadas en archivos JPEG con nombres personalizados.
+     */
     public void startCamera() {
         capture = new VideoCapture(0);
         image = new Mat();
@@ -80,6 +94,13 @@ public class Camera extends JFrame {
             }
         }
     }
+
+    /**
+     * Método principal que carga la biblioteca nativa de OpenCV, crea una
+     * instancia de la clase Camera y ejecuta la cámara en un hilo separado.
+     *
+     * @param args Argumentos de línea de comandos (no utilizados en este caso).
+     */
     public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         EventQueue.invokeLater(new Runnable() {
