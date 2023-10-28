@@ -2,44 +2,34 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-// Importing date class of sql package
+import java.io.File;
 import java.sql.Date;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
-// Importing VideoCapture class
-// This class is responsible for taking screenshot
 import org.opencv.videoio.VideoCapture;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 
-// Class - Swing Class
 public class Camera extends JFrame {
 
-    // Camera screen
     private JLabel cameraScreen;
-
-    // Button for image capture
     private JButton btnCapture;
-
-    // Start camera
     private VideoCapture capture;
-
-    // Store image as 2D matrix
     private Mat image;
-
     private boolean clicked = false;
 
-    public Camera()
-    {
-
-        // Designing UI
+    public Camera() {
         setLayout(null);
 
         cameraScreen = new JLabel();
@@ -52,9 +42,7 @@ public class Camera extends JFrame {
 
         btnCapture.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
-
+            public void actionPerformed(ActionEvent e) {
                 clicked = true;
             }
         });
@@ -65,63 +53,86 @@ public class Camera extends JFrame {
         setVisible(true);
     }
 
-    // Creating a camera
-    public void startCamera()
-    {
+    public void startCamera() {
         capture = new VideoCapture(0);
         image = new Mat();
         byte[] imageData;
 
         ImageIcon icon;
         while (true) {
-            // read image to matrix
             capture.read(image);
 
-            // convert matrix to byte
             final MatOfByte buf = new MatOfByte();
             Imgcodecs.imencode(".jpg", image, buf);
 
             imageData = buf.toArray();
 
-            // Add to JLabel
             icon = new ImageIcon(imageData);
             cameraScreen.setIcon(icon);
 
-            // Capture and save to file
             if (clicked) {
-                // prompt for enter image name
                 String name = JOptionPane.showInputDialog(
                         this, "Enter image name");
                 if (name == null) {
                     name = new SimpleDateFormat(
-                            "yyyy-mm-dd-hh-mm-ss")
-                            .format(new Date(
-                                    HEIGHT, WIDTH, getX()));
+                            "yyyy-MM-dd-HH-mm-ss")
+                            .format(new Date(System.currentTimeMillis()));
                 }
 
-                // Write to file
-                Imgcodecs.imwrite("images/" + name + ".jpg",
-                        image);
+                String imagePath = System.getProperty("user.dir") + "/" + name + ".jpg";
+                Imgcodecs.imwrite(imagePath, image);
+
+                // Recognize text and evaluate the mathematical expression
+                processSavedImage(imagePath);
 
                 clicked = false;
             }
         }
     }
 
-    // Main driver method
-    public static void main(String[] args)
-    {
+    private void processSavedImage(String imagePath) {
+        // Recognize text using Tesseract OCR
+        String recognizedText = recognizeText(imagePath);
+        System.out.println("Recognized text: " + recognizedText);
+
+        // Evaluate the mathematical expression
+        double result = evaluateExpression(recognizedText);
+        System.out.println("Result: " + result);
+    }
+
+    private String recognizeText(String imagePath) {
+        ITesseract tesseract = new Tesseract();
+
+        try {
+            tesseract.setDatapath("path/to/tessdata");
+            return tesseract.doOCR(new File(imagePath));
+        } catch (TesseractException e) {
+            e.printStackTrace();
+            return "Error during OCR";
+        }
+    }
+
+    private double evaluateExpression(String expression) {
+        try {
+            Expression e = new ExpressionBuilder(expression)
+                    .build();
+            return e.evaluate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Double.NaN; // Indicate error in evaluation
+        }
+    }
+
+    public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         EventQueue.invokeLater(new Runnable() {
-            // Overriding existing run() method
-            @Override public void run()
-            {
+            @Override
+            public void run() {
                 final Camera camera = new Camera();
 
-                // Start camera in thread
                 new Thread(new Runnable() {
-                    @Override public void run()
-                    {
+                    @Override
+                    public void run() {
                         camera.startCamera();
                     }
                 }).start();
