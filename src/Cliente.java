@@ -148,7 +148,7 @@ class VentanaCliente extends JFrame implements Runnable{
         Tesseract tesseract = new Tesseract();
         try {
             tesseract.setDatapath("C:\\Users\\jungi\\Desktop\\Tesseract\\Tess4J-3.4.8-src\\Tess4J\\tessdata");
-            String text = tesseract.doOCR(new File("test.png"));
+            String text = tesseract.doOCR(new File("test 1.jpg"));
             operacionA.setText(text);
         } catch (TesseractException e) {
             e.printStackTrace();
